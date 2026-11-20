@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://api.gitbook.com/gitbook-docs.yaml
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+version: 1
+
+site:
+  title: Alignment Course
+  structure:
+    - type: space
+      key: alignment-course
+      title: Alignment Course
+      path: alignment-course
+      default: true
+      content:
+        directory: ./
+        language: en
