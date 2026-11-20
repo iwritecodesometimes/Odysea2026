@@ -1,6 +1,7 @@
 # Week 8: Singular Learning Theory
 
-**Author:** TBD
+**Author:** Odysea 2026 Technical Team
+**Mentor:** TBD
 **Date:** 12 Nov 2026
 
 ---

@@ -1,6 +1,7 @@
 # Week 3: Alignment in Practice
 
 **Author:** Odysea 2026 Technical Team
+**Mentor:** TBD
 **Date:** 8 Oct 2026
 
 ---
