@@ -5,14 +5,18 @@
 
 ---
 
-## Decision theory: what is a good decision?
+## Reinforcement learning: how agents learn from reward
 
-A reinforcement learning agent chooses actions to get high reward. Behind that sits an older question: what makes a decision *rational* in the first place? This week looks at **decision theory**, the study of how an agent should choose. We start with a general point about how fields turn vague questions into precise theories. We then see how the standard theory of preferences, utilities and rewards works, and how it starts to break down for agents that are part of the world they act in.
+**Reinforcement learning (RL)** is the study of agents that learn to act by trial and error, guided by a reward signal. It trained game-playing systems like AlphaGo, and today it is a key step in turning a pretrained language model into a helpful assistant. This week starts with the foundations of RL and the ways it goes wrong. We then step back to an older question that sits behind it: what makes a decision *rational* in the first place? This is the subject of **decision theory**, the study of how an agent should choose. We see how the standard theory of preferences, utilities and rewards works, and how it starts to break down for agents that are part of the world they act in.
 
 ### What you'll learn
 
 By the end of the week, you will be able to:
 
+* Describe the agent–environment loop and the parts of a Markov decision process (MDP).
+* Explain what returns, policies and value functions are, and state the Bellman equation.
+* Explain the exploration–exploitation trade-off, and the difference between value-based and policy-gradient methods.
+* Explain reward hacking and goal misgeneralisation, with an example of each.
 * Explain what an *operationalisation* (or "solution concept") is, and why any precise theory of a vague question must leave something out.
 * Explain how preferences, utilities and rewards relate, and state what the von Neumann–Morgenstern theorem says.
 * Explain the difference between *dualistic* and *embedded* agents.
@@ -24,19 +28,97 @@ By the end of the week, you will be able to:
 
 The week runs as two 1-hour discussion sessions. Each session follows the same pattern.
 
-| Time    | Session                | Breakdown                                       |
+| Time    | Activity               | Breakdown                                       |
 | ------- | ---------------------- | ----------------------------------------------- |
 | 20 min  | Lecture                | Introduction to the week's topics               |
 | 20 min  | Small group discussion | Work through the problem cases and questions    |
 | 20 min  | Combined discussion    | Whole-group discussion led by the head TA       |
 
-Session 1 covers Part 1 (operationalisations) and the background in Part 2. Session 2 covers the decision problems and the implications for AI.
+Session 1 covers Part 1 (reinforcement learning). Session 2 covers Part 2 (operationalisations) and Part 3 (decision theory). Part 4 brings both sessions together.
 
 ---
 
 ## Summary
 
-### Part 1: Operationalisations across fields
+### Part 1: Reinforcement learning
+
+#### The agent–environment loop
+
+An RL problem has two parts: an **agent** and an **environment**. At each time step $$t$$, the agent sees the current **state** $$s_t$$, takes an **action** $$a_t$$, and the environment responds with a **reward** $$r_{t+1}$$ and a new state $$s_{t+1}$$. Nobody tells the agent which action is correct. It must find out by trying actions and seeing what reward follows.
+
+This is different from supervised learning, where every example comes with the right answer. In RL, feedback is *evaluative* (how good was that?) not *instructive* (what should you have done?), and it is often *delayed*: a move early in a game of chess may only pay off many moves later.
+
+#### Markov decision processes
+
+The standard formal model is a **Markov decision process (MDP)**, made up of:
+
+* a set of states $$\mathcal{S}$$ and a set of actions $$\mathcal{A}$$;
+* transition probabilities $$P(s' \mid s, a)$$, the chance of moving to state $$s'$$ after taking action $$a$$ in state $$s$$;
+* a reward function $$r(s, a)$$;
+* a discount factor $$\gamma \in [0, 1)$$.
+
+"Markov" means that the next state depends only on the current state and action, not on the full history. When the agent cannot see the full state, the model becomes a *partially observable* MDP (POMDP), and the agent must act on its trajectory of observations instead. This is the setting used in Part 3.
+
+#### Returns, policies and values
+
+The agent's goal is to maximise the **return**, the discounted sum of future rewards:
+
+$$G_t = r_{t+1} + \gamma r_{t+2} + \gamma^2 r_{t+3} + \cdots = \sum_{k=0}^{\infty} \gamma^k r_{t+k+1}$$
+
+The discount factor makes near rewards count more than distant ones, and keeps the sum finite.
+
+A **policy** $$\pi(a \mid s)$$ is the agent's rule for choosing actions: the probability of taking action $$a$$ in state $$s$$. The **value** of a state under a policy is the expected return from starting there and following that policy:
+
+$$V^\pi(s) = \mathbb{E}_\pi\left[G_t \mid s_t = s\right]$$
+
+The **action value** $$Q^\pi(s, a)$$ is the same, but for taking action $$a$$ first and then following $$\pi$$.
+
+**The Bellman equation.** Values satisfy a recursive relation: the value of a state is the expected immediate reward plus the discounted value of the next state.
+
+$$V^\pi(s) = \mathbb{E}_{a \sim \pi,\, s' \sim P}\left[r(s, a) + \gamma V^\pi(s')\right]$$
+
+Most RL algorithms use some form of this equation. They improve an estimate of the value by moving it towards "reward now, plus my estimate of what comes next".
+
+#### Exploration and exploitation
+
+To get high reward, the agent should *exploit* the actions it already knows are good. But to find good actions in the first place, it must *explore* actions it has not tried enough. Too little exploration and the agent can get stuck on a mediocre strategy. Too much and it wastes time on actions it already knows are bad. A simple fix is **$$\varepsilon$$-greedy**: take the best-known action most of the time, and a random action with small probability $$\varepsilon$$.
+
+#### Two families of methods
+
+* **Value-based methods** learn $$Q(s, a)$$ and then act greedily with respect to it. The classic example is **Q-learning**, which after each step updates
+
+  $$Q(s, a) \leftarrow Q(s, a) + \alpha\left[r + \gamma \max_{a'} Q(s', a') - Q(s, a)\right]$$
+
+  where $$\alpha$$ is a learning rate. The term in brackets is the *temporal-difference error*: the gap between what the agent expected and what it got.
+* **Policy-gradient methods** adjust the policy's parameters $$\theta$$ directly, making actions that led to high return more likely:
+
+  $$\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\sum_t \nabla_\theta \log \pi_\theta(a_t \mid s_t)\, G_t\right]$$
+
+  Methods such as PPO, which is widely used to fine-tune language models, belong to this family.
+
+**RL for language models.** In **reinforcement learning from human feedback (RLHF)**, people compare pairs of model outputs, a *reward model* is trained to predict their preferences, and the language model is then fine-tuned with RL to get high reward from that model (Ouyang et al., 2022). Here the "action" is the text the model writes, and the reward is a learned stand-in for what people want.
+
+#### Where it goes wrong
+
+RL agents optimise the reward they are *given*, which is not always the goal we *meant*.
+
+* **Reward hacking** (or *specification gaming*). The agent finds a way to get high reward that the designer did not intend. In a well-known example, an agent trained on a boat-racing game learned to circle a lagoon hitting the same reward targets forever, catching fire and crashing, instead of finishing the race (Clark and Amodei, 2016). With RLHF, a model can learn to produce answers that *sound* good to the reward model without being correct.
+* **Goal misgeneralisation.** The agent learns a goal that matches the reward during training but differs from it in new situations. In one example, an agent trained to reach a coin that was always at the end of the level learned to "go right" instead of "get the coin". When the coin was moved, it ran past it (Langosco et al., 2022). Unlike reward hacking, the reward here was correct. The agent learned the wrong goal from it.
+
+{% hint style="info" %}
+**Why this matters for alignment.** We cannot write down a reward that captures everything we care about, and a capable optimiser will find the gaps in whatever we do write down. Part 3 asks a deeper question: even in principle, can our preferences be written as a reward at all?
+{% endhint %}
+
+{% hint style="success" %}
+**Discussion**
+
+1. Think of a reward or incentive in everyday life (exam grades, sales targets, social media likes) that people "hack". What does this suggest about writing reward functions for AI systems?
+2. Is the line between reward hacking and goal misgeneralisation always clear? Can you think of a case that could be described as either?
+3. In RLHF, the reward comes from a model of human preferences. What could go wrong with that model, and how might the language model exploit it?
+4. Why does a good RL agent need to explore? When might exploration itself be dangerous?
+{% endhint %}
+
+### Part 2: Operationalisations across fields
 
 **The pattern.** Many investigations in philosophy and the formal sciences share one structure:
 
@@ -72,7 +154,7 @@ Keep this thesis in mind for the rest of the week. Decision theories are operati
 3. The thesis says that any precise answer must miss something in the original question. Do you agree? Is there a precise theory you think captures its question completely?
 {% endhint %}
 
-### Part 2: Decision theory
+### Part 3: Decision theory
 
 #### Two senses of "decision theory"
 
@@ -96,7 +178,7 @@ We build up the standard theory step by step.
 
 **Uncertainty: the von Neumann–Morgenstern theorem.** Now let the agent compare *lotteries* (probability distributions) over outcomes. Suppose preferences over lotteries satisfy four axioms: completeness, transitivity, **continuity** (no outcome is infinitely better or worse than another) and **independence** (mixing both options with the same third lottery does not change which one you prefer). Then there is a utility function $$u$$ such that the agent prefers one lottery to another exactly when it has higher *expected* utility. The function $$u$$ is unique up to a positive affine transformation $$u'(x) = a + b\,u(x)$$ with $$b > 0$$.
 
-**Rewards.** Given a utility over trajectories, you can define the reward of a step as the change in utility it causes: $$r(t; h) := u(t \cdot h) - u(h)$$. But this reward may depend on everything that comes after the step. To get the step-by-step rewards that reinforcement learning uses, we need one more assumption. Following Bowling et al. (2023), this is a *temporal* $$\gamma$$*-indifference* axiom, which also brings in the discount factor $$\gamma$$.
+**Rewards.** Given a utility over trajectories, you can define the reward of a step $$x$$ as the change in utility it causes: $$r(x; h) := u(x \cdot h) - u(h)$$. But this reward may depend on everything that comes after the step. To get the step-by-step rewards that reinforcement learning uses, we need one more assumption. Following Bowling et al. (2023), this is a *temporal* $$\gamma$$*-indifference* axiom, which also brings in the discount factor $$\gamma$$.
 
 {% hint style="info" %}
 **Why this matters.** Reinforcement learning assumes that what we want can be written as a sum of (discounted) rewards. The axioms above show that this is a *substantive assumption* about our preferences, not a free choice. If real preferences break any of the axioms, no reward function captures them exactly.
@@ -177,7 +259,7 @@ FDT treats your decision as the output of a function that may also be running el
 **Terminology.** *CDT* chooses the action that causes the best outcome. *EDT* chooses the action that is the best evidence of a good outcome. *FDT* chooses the output of its own decision procedure that gives the best outcome, across every place that procedure is run or predicted.
 {% endhint %}
 
-### Part 3: Implications for AI
+### Part 4: Implications for AI
 
 Formal decision problems rest on many assumptions. Several "science fiction" scenarios from the problems above are realistic for AI systems:
 
@@ -194,7 +276,7 @@ There is no settled answer to what counts as a "correct" decision. This is a the
 3. The toxin puzzle asks whether you can honestly intend to do something that you know you will have no reason to do. What does this have to do with reputation, promises, or an AI system's commitments?
 4. Is there one rational answer to these problems, or are there two kinds of rationality, one for decisions and one for character? Which kind should we want an AI system to have?
 5. Two copies of the same AI model play a prisoner's dilemma. Should they cooperate? Would you *want* them to, if the "game" were, for example, two AI systems deciding whether to report each other's misbehaviour to their developers?
-6. How does this week connect to reinforcement learning? What assumptions does an RL agent make about its preferences, and about its separation from the world?
+6. Look back at Part 1. What assumptions does an RL agent make about its preferences, and about its separation from the world? Which of the problems above could an RL agent face?
 {% endhint %}
 
 ---
@@ -203,6 +285,8 @@ There is no settled answer to what counts as a "correct" decision. This is a the
 
 These are starting points for the topics above.
 
+* Sutton, R. S. and Barto, A. G. (2018). *Reinforcement learning: An introduction* (2nd ed.). MIT Press. [http://incompleteideas.net/book/the-book-2nd.html](http://incompleteideas.net/book/the-book-2nd.html). The standard textbook, free online. Chapters 1, 3 and 6 cover the ideas in Part 1.
+* Amodei, D., Olah, C., Steinhardt, J., Christiano, P., Schulman, J. and Mané, D. (2016). *Concrete problems in AI safety*. [https://arxiv.org/abs/1606.06565](https://arxiv.org/abs/1606.06565). Includes reward hacking and safe exploration as open problems.
 * Demski, A. and Garrabrant, S. (2019). *Embedded agency*. [https://arxiv.org/abs/1902.09469](https://arxiv.org/abs/1902.09469). The standard introduction to the problems of agents that are part of their environment.
 * Yudkowsky, E. and Soares, N. (2017). *Functional decision theory: A new theory of instrumental rationality*. [https://arxiv.org/abs/1710.05060](https://arxiv.org/abs/1710.05060). The original statement of FDT, with Newcomb's problem, the smoking lesion and counterfactual mugging.
 
@@ -211,3 +295,6 @@ These are starting points for the topics above.
 ## References
 
 * Bowling, M., Martin, J. D., Abel, D. and Dabney, W. (2023). *Settling the reward hypothesis*. ICML 2023. [https://arxiv.org/abs/2212.10420](https://arxiv.org/abs/2212.10420). The source of the temporal $$\gamma$$-indifference axiom.
+* Clark, J. and Amodei, D. (2016). *Faulty reward functions in the wild*. OpenAI blog. [https://openai.com/index/faulty-reward-functions/](https://openai.com/index/faulty-reward-functions/). The source of the boat-racing example.
+* Langosco, L., Koch, J., Sharkey, L., Pfau, J. and Krueger, D. (2022). *Goal misgeneralization in deep reinforcement learning*. ICML 2022. [https://arxiv.org/abs/2105.14111](https://arxiv.org/abs/2105.14111). The source of the coin example.
+* Ouyang, L. et al. (2022). *Training language models to follow instructions with human feedback*. [https://arxiv.org/abs/2203.02155](https://arxiv.org/abs/2203.02155). The InstructGPT paper, which describes the RLHF pipeline.
