@@ -1,7 +1,6 @@
 # Week 3: Alignment in Practice
 
-**Author:** Odysea 2026 Technical Team
-**Mentor:** TBD
+**Mentor:** [Daniel Tan](https://scholar.google.com/citations?user=QKO1QacAAAAJ&hl=en) \
 **Date:** 8 Oct 2026
 
 ---
@@ -43,7 +42,6 @@ But we built them without much fundamental understanding. Language models are gr
 In particular, we do not know how to robustly align the models we build with human values. We have a collection of heuristics and patches that work some of the time, but the "physics" of LLM alignment is still poorly understood. Persona selection is one of the more important intuitions we have. This week asks both how far it gets us and where it stops working.
 
 ---
-
 
 ## Reading guide
 

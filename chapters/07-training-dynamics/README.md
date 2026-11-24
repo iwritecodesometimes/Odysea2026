@@ -1,7 +1,6 @@
 # Week 7: Training Dynamics
 
-**Author:** Odysea 2026 Technical Team\
-**Mentor:** James Ming Liang Ang\
+**Mentor:** [James Ming Liang Ang](https://scholar.google.com/citations?user=hepV8W8AAAAJ&hl=en)\
 **Date:** 5 Nov 2026
 
 ---

@@ -1,7 +1,6 @@
 # Week 2: AI Alignment
 
-**Author:** Odysea 2026 Technical Team\
-**Mentor:** Shashvat Shukla\
+**Mentor:** [Shashvat Shukla](https://scholar.google.com/citations?user=NAT7yTUAAAAJ&hl=en)\
 **Date:** 1 Oct 2026
 
 ---
@@ -42,7 +41,7 @@ Session 1 covers alignment targets. Session 2 covers foundational versus prosaic
 | 1–2   | Introduction to the course; introduction to alignment          | Shashvat Shukla   |
 | 3     | Alignment in practice                                          | Daniel Tan        |
 | 4–5   | Why deep learning works; techniques and findings in mech interp | Nicholas Chen     |
-| 6     | Decision theory                                                | Shashvat Shukla   |
+| 6     | Reinforcement learning                                         | Shashvat Shukla   |
 | 7–8   | Learning dynamics and singular learning theory                 | Ming Liang        |
 
 **Why foundations?** There are three reasons to study the foundations now.

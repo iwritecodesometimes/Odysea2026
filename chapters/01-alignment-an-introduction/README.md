@@ -1,7 +1,6 @@
 # Week 1: Alignment: An Introduction
 
-**Author:** Odysea 2026 Technical Team\
-**Mentor:** Shashvat Shukla\
+**Mentor:** [Shashvat Shukla](https://scholar.google.com/citations?user=NAT7yTUAAAAJ&hl=en)\
 **Date:** 24 Sep 2026
 
 ---

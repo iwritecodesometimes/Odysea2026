@@ -1,7 +1,6 @@
-# Week 6: Decision Theory
+# Week 6: Reinforcement Learning
 
-**Author:** Odysea 2026 Technical Team\
-**Mentor:** TBD\
+**Mentor:** [Shashvat Shukla](https://scholar.google.com/citations?user=NAT7yTUAAAAJ&hl=en)\
 **Date:** 29 Oct 2026
 
 ---

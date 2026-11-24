@@ -1,7 +1,6 @@
 # Week 5: Mysteries of Deep Learning
 
-**Author:** Odysea 2026 Technical Team\
-**Mentor:** TBD\
+**Mentor:** [Nicholas Chen](https://scholar.google.com/citations?user=mBM4R48AAAAJ) \
 **Date:** 22 Oct 2026
 
 ---

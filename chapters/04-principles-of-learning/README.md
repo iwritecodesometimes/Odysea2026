@@ -1,7 +1,6 @@
 # Week 4: Principles of Learning
 
-**Author:** Odysea 2026 Technical Team\
-**Mentor:** TBD\
+**Mentor:** Nicholas Chen
 **Date:** 15 Oct 2026
 
 ---
